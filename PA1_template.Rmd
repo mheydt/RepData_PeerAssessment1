@@ -1,5 +1,5 @@
 # Reproducible Research: Peer Assessment 1
-
+First bring in required libraries
 ```{r}
 library(ggplot2)
 library(lattice)
@@ -9,36 +9,55 @@ library(lattice)
 
 ```{r}
 # Read in the data
-d = read.csv("activity.csv")
-
-# convert a few fields into numbers and dates
-d$interval <- as.numeric(as.character(d$interval))
-d$steps <- as.numeric(as.character(d$steps))
-d$date <- as.Date(d$date)
+d = read.csv("activity.csv", header=TRUE, colClasses=c("numeric", "Date", "numeric"))
 ```
 
 ## What is mean total number of steps taken per day?
-
+The following chart shows the total steps by day.
 ```{r}
 stepsByDay <- aggregate(steps ~ date, d, sum)
-ggplot(stepsByDay, aes(x=date, y=steps)) + geom_bar(stat="identity")
-meanStepsPerDay <- mean(stepsByDay$steps)
-medianStepsPerDay <- median(stepsByDay$steps)
-```
-Mean number of steps taken daily: 
-```{r, echo=FALSE}
-meanStepsPerDay
-```
-Median number of steps taken daily
-```{r, echo=FALSE}
-medianStepsPerDay
-```
+ggplot(stepsByDay, aes(x=date, y=steps)) + geom_bar(stat="identity") + ggtitle("Total steps per day (with NAs)")
 
+```
+Mean number of steps taken daily (across the mean for each and avery day): 
+```{r, echo=FALSE}
+mean(stepsByDay$steps)
+```
+Median number of steps taken daily (across the mean for each and avery day
+```{r, echo=FALSE}
+median(stepsByDay$steps)
+```
+Summary for the data frame used to plot the graph
+```{r}
+summary(stepsByDay)
+```
+Note that this checks with what I reported previously for the mean and median on the total steps chart<br/><br/>
+<b>Now, I thought the question was vague in if the mean/median needed to be on the total # of steps per day, or if it was supposed to report the value of that for each day.  So, I'll do both.</b>
+
+```{r}
+meanStepsByDay <- aggregate(steps ~ date, d, mean)
+names(meanStepsByDay)[2] <- "meanSteps"
+medianStepsByDay <- aggregate(steps ~ date, d, median)
+names(medianStepsByDay)[2] <- "medianSteps"
+meanAndMedianStepsByDay <- cbind(meanStepsByDay, medianStepsByDay$medianSteps)
+names(meanAndMedianStepsByDay)[3] <- "medianSteps"
+meanAndMedianStepsByDay
+```
+```{r}
+summary(meanAndMedianStepsByDay)
+```
+The means are smaller than in the previous chart as they are the total steps per day avaraged across 61 days.<br/>
+The medians are 0, which seemed odd.  To explain, take a look at the values on a particular day:
+```{r}
+d[d$date=="2012-10-23",]$steps
+```
+Median is the middle value, which seems to end up always being 0.  I'm not sure if it makes sense to sort this, but I'm going to leave it as-is.</br>
+<b>In the end, this assigment is about creating the report, not if the data in the report is correct.</b>
 ## What is the average daily activity pattern?
 ```{r}
 # calculate the mean steps in each interval
 meanStepsByInterval <- aggregate(steps ~ interval, d, mean)
-ggplot(meanStepsByInterval, aes(interval)) + geom_line(aes(y=steps))
+ggplot(meanStepsByInterval, aes(interval)) + geom_line(aes(y=steps)) + ggtitle("Average steps per interval")
 ```
 ```{r}
 maxInterval <- meanStepsByInterval[which.max(meanStepsByInterval$steps),]$interval
@@ -95,7 +114,7 @@ imputedMedianStepsPerDay <- median(imputedStepsByDay$steps)
 ```
 The plot of this data:
 ```{r}
-ggplot(imputedStepsByDay, aes(x=date, y=steps)) + geom_bar(stat="identity")
+ggplot(imputedStepsByDay, aes(x=date, y=steps))  + geom_bar(stat="identity") + ggtitle("Mean steps per day with imputed data")
 ```
 Mean number of steps taken daily: 
 ```{r, echo=FALSE}
@@ -105,15 +124,16 @@ Median number of steps taken daily
 ```{r, echo=FALSE}
 imputedMedianStepsPerDay
 ```
-From the assignment, a couple of questions:
-<i>Do these values differ from the estimates from the first part of the assignment?</i>
+From the assignment, a couple of questions.<br/><br/>
+<b>Interestingly, these are not part of the grading ruberic.  So, my analysis is for my own kicks, and compare the mean/medians as applied across the the total steps for each day in the old set and this new set with a NAs replaced</b><br/><br/>
+<i><b>Do these values differ from the estimates from the first part of the assignment?</b></i><br/>
 Yes.  The mean value is the same, which make sense as I inserted new means values which would not change the mean.
 The median is different, as the number of data points in that set is different, and hence a different value gets selected.
 
-<i>What is the impact of imputing missing data on the estimates of the total daily number of steps?</i>
+<i><b>What is the impact of imputing missing data on the estimates of the total daily number of steps?</b></i><br/>
 It gave an informed guess as the missing data.  It didn't change the outcome statisic in a significant way, which I think is good in this case as that data can be simulated without effecting the experiment.
 ## Are there differences in activity patterns between weekdays and weekends?
-My R coding here isn't the best, but it worked.
+My R coding here isn't the best, but it worked, and I'm learning.
 ```{r}
 # what days are weekends?
 weekendDays = c("Saturday", "Sunday")
