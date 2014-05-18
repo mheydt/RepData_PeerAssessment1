@@ -18,7 +18,7 @@ d = read.csv("activity.csv", header = TRUE, colClasses = c("numeric", "Date",
 
 
 ## What is mean total number of steps taken per day?
-The following chart shows the total steps by day.
+The following chart shows the total steps by day.  Note that it is a bar chart, not a histogram.  A histogram wouldn't make sense in showing total steps per day.
 
 ```r
 stepsByDay <- aggregate(steps ~ date, d, sum)

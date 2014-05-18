@@ -196,7 +196,7 @@ d = read.csv(&quot;activity.csv&quot;, header = TRUE, colClasses = c(&quot;numer
 
 <h2>What is mean total number of steps taken per day?</h2>
 
-<p>The following chart shows the total steps by day.</p>
+<p>The following chart shows the total steps by day.  Note that it is a bar chart, not a histogram.  A histogram wouldn&#39;t make sense in showing total steps per day.</p>
 
 <pre><code class="r">stepsByDay &lt;- aggregate(steps ~ date, d, sum)
 ggplot(stepsByDay, aes(x = date, y = steps)) + geom_bar(stat = &quot;identity&quot;) + 
